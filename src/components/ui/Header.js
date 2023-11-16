@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import "./header.css";
 import {
   AppBar,
   Toolbar,
@@ -10,6 +11,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import styled from "@emotion/styled";
 
 import logo from "../../assets/logo.svg";
@@ -18,6 +20,8 @@ import { Link } from "react-router-dom";
 const ToolbarMargin = styled("div")(({ theme }) => ({
   ...theme.mixins.toolbar,
   marginBottom: "3rem",
+  [theme.breakpoints.down("md")]: { marginBottom: "1.5rem" },
+  [theme.breakpoints.down("sm")]: { marginBottom: "0.68rem" },
 }));
 
 function ElevationScroll(props) {
@@ -34,7 +38,9 @@ function ElevationScroll(props) {
 
 function Header() {
   const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.down("md"));
   const [value, setValue] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
   const [open, setOpen] = useState(false);
   const handleTabChange = (e, updateValue) => {
@@ -47,6 +53,11 @@ function Header() {
   const handleMouseOut = () => {
     setAnchorEl(null);
     setOpen(false);
+  };
+  const handleMenueItemClick = (e, i) => {
+    setValue(1);
+    handleMouseOut();
+    setSelectedIndex(i);
   };
 
   const routes = [
@@ -86,7 +97,9 @@ function Header() {
   ];
   useEffect(() => {
     const pathName = window.location.pathname;
-    const pathObject = routes.find((route) => route.link === pathName);
+    const pathObject = [...routes, ...menuOptions].find(
+      (route) => route.link === pathName
+    );
     if (pathObject && pathObject?.activeIndex !== value) {
       setValue(pathObject.activeIndex);
     }
@@ -103,73 +116,80 @@ function Header() {
               sx={{ padding: 0 }}
               disableRipple
             >
-              <img alt="company logo" src={logo} style={{ height: "7rem" }} />
+              <img alt="company logo" src={logo} className="logo-size" />
             </Button>
-            <Tabs
-              value={value}
-              onChange={handleTabChange}
-              textColor="inherit"
-              //   indicatorColor="secondary"
-              sx={{ marginLeft: "auto" }}
-            >
-              {routes.map((route, index) => (
-                <Tab
-                  key={`${route.name}-${index}`}
-                  label={route.name}
-                  component={Link}
-                  to={route.link}
-                  aria-owns={route.ariaOwns}
-                  aria-haspopup={route.ariaPopup}
-                  onMouseOver={route.mouseOver}
+            {matches ? null : (
+              <>
+                <Tabs
+                  value={value}
+                  onChange={handleTabChange}
+                  textColor="inherit"
+                  //   indicatorColor="secondary"
+                  sx={{ marginLeft: "auto" }}
+                >
+                  {routes.map((route, index) => (
+                    <Tab
+                      key={`${route.name}-${index}`}
+                      label={route.name}
+                      component={Link}
+                      to={route.link}
+                      aria-owns={route.ariaOwns}
+                      aria-haspopup={route.ariaPopup}
+                      onMouseOver={route.mouseOver}
+                      sx={(theme) => ({
+                        ...theme.typography.tab,
+                        minWidth: 10,
+                        marginLeft: "25px",
+                      })}
+                    />
+                  ))}
+                </Tabs>
+                <Button
+                  variant="contained"
+                  color="secondary"
                   sx={(theme) => ({
-                    ...theme.typography.tab,
-                    minWidth: 10,
-                    marginLeft: "25px",
-                  })}
-                />
-              ))}
-            </Tabs>
-            <Button
-              variant="contained"
-              color="secondary"
-              sx={(theme) => ({
-                ...theme.typography.estimate,
-                borderRadius: "50px",
-                marginLeft: "50px",
-                marginRight: "25px",
-                height: "45px",
-              })}
-            >
-              Free Estimation
-            </Button>
-            <Menu
-              id="services-menue"
-              anchorEl={anchorEl}
-              open={open}
-              onClose={handleMouseOut}
-              MenuListProps={{ onMouseLeave: handleMouseOut }}
-              sx={(theme) => ({
-                ".MuiMenu-paper": { ...theme.typography.customClasses.menu },
-              })}
-              elevation={0}
-            >
-              {menuOptions.map((option, idx) => (
-                <MenuItem
-                  key={`${option.name}-${idx}`}
-                  onClick={() => {
-                    setValue(1);
-                    handleMouseOut();
-                  }}
-                  component={Link}
-                  to={option.link}
-                  sx={(theme) => ({
-                    ...theme.typography.customClasses.menuItem,
+                    ...theme.typography.estimate,
+                    borderRadius: "50px",
+                    marginLeft: "50px",
+                    marginRight: "25px",
+                    height: "45px",
                   })}
                 >
-                  {option.name}
-                </MenuItem>
-              ))}
-            </Menu>
+                  Free Estimation
+                </Button>
+                <Menu
+                  id="services-menue"
+                  anchorEl={anchorEl}
+                  open={open}
+                  onClose={handleMouseOut}
+                  MenuListProps={{ onMouseLeave: handleMouseOut }}
+                  sx={(theme) => ({
+                    ".MuiMenu-paper": {
+                      ...theme.typography.customClasses.menu,
+                    },
+                  })}
+                  elevation={0}
+                  value={selectedIndex}
+                >
+                  {menuOptions.map((option, idx) => (
+                    <MenuItem
+                      key={`${option.name}-${idx}`}
+                      onClick={(e) =>
+                        handleMenueItemClick(e, option.selectedIndex)
+                      }
+                      selected={option.selectedIndex === selectedIndex}
+                      component={Link}
+                      to={option.link}
+                      sx={(theme) => ({
+                        ...theme.typography.customClasses.menuItem,
+                      })}
+                    >
+                      {option.name}
+                    </MenuItem>
+                  ))}
+                </Menu>
+              </>
+            )}
           </Toolbar>
         </AppBar>
       </ElevationScroll>
