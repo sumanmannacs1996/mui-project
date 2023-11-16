@@ -9,9 +9,12 @@ import {
   Tab,
   Menu,
   MenuItem,
+  SwipeableDrawer,
+  IconButton,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
+import MenuIcon from "@mui/icons-material/Menu";
 import styled from "@emotion/styled";
 
 import logo from "../../assets/logo.svg";
@@ -37,22 +40,26 @@ function ElevationScroll(props) {
 }
 
 function Header() {
+  const iOS =
+    typeof navigator !== "undefined" &&
+    /iPad|iPhone|iPod/.test(navigator.userAgent);
   const theme = useTheme();
   const matches = useMediaQuery(theme.breakpoints.down("md"));
   const [value, setValue] = useState(0);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
-  const [open, setOpen] = useState(false);
+  const [openMenue, setOpenMenue] = useState(false);
+  const [openDrawer, setOpenDrawer] = useState(false);
   const handleTabChange = (e, updateValue) => {
     setValue(updateValue);
   };
   const handleMouseOver = (e) => {
     setAnchorEl(e.currentTarget);
-    setOpen(true);
+    setOpenMenue(true);
   };
   const handleMouseOut = () => {
     setAnchorEl(null);
-    setOpen(false);
+    setOpenMenue(false);
   };
   const handleMenueItemClick = (e, i) => {
     setValue(1);
@@ -104,6 +111,98 @@ function Header() {
       setValue(pathObject.activeIndex);
     }
   }, [value]);
+
+  const tabs = (
+    <>
+      <Tabs
+        value={value}
+        onChange={handleTabChange}
+        textColor="inherit"
+        //   indicatorColor="secondary"
+        sx={{ marginLeft: "auto" }}
+      >
+        {routes.map((route, index) => (
+          <Tab
+            key={`${route.name}-${index}`}
+            label={route.name}
+            component={Link}
+            to={route.link}
+            aria-owns={route.ariaOwns}
+            aria-haspopup={route.ariaPopup}
+            onMouseOver={route.mouseOver}
+            sx={(theme) => ({
+              ...theme.typography.tab,
+              minWidth: 10,
+              marginLeft: "25px",
+            })}
+          />
+        ))}
+      </Tabs>
+      <Button
+        variant="contained"
+        color="secondary"
+        sx={(theme) => ({
+          ...theme.typography.estimate,
+          borderRadius: "50px",
+          marginLeft: "50px",
+          marginRight: "25px",
+          height: "45px",
+        })}
+      >
+        Free Estimation
+      </Button>
+      <Menu
+        id="services-menue"
+        anchorEl={anchorEl}
+        open={openMenue}
+        onClose={handleMouseOut}
+        MenuListProps={{ onMouseLeave: handleMouseOut }}
+        sx={(theme) => ({
+          ".MuiMenu-paper": {
+            ...theme.typography.customClasses.menu,
+          },
+        })}
+        elevation={0}
+        value={selectedIndex}
+      >
+        {menuOptions.map((option, idx) => (
+          <MenuItem
+            key={`${option.name}-${idx}`}
+            onClick={(e) => handleMenueItemClick(e, option.selectedIndex)}
+            selected={option.selectedIndex === selectedIndex}
+            component={Link}
+            to={option.link}
+            sx={(theme) => ({
+              ...theme.typography.customClasses.menuItem,
+            })}
+          >
+            {option.name}
+          </MenuItem>
+        ))}
+      </Menu>
+    </>
+  );
+
+  const drawer = (
+    <>
+      <SwipeableDrawer
+        disableBackdropTransition={!iOS}
+        disableDiscovery={iOS}
+        open={openDrawer}
+        onClose={() => setOpenDrawer(false)}
+        onOpen={() => setOpenDrawer(true)}
+      >
+        Example Drawer
+      </SwipeableDrawer>
+      <IconButton
+        onClick={() => setOpenDrawer((prev) => !prev)}
+        disableRipple
+        sx={{ marginLeft: "auto" }}
+      >
+        <MenuIcon sx={{ height: "50px", width: "50px" }} />
+      </IconButton>
+    </>
+  );
   return (
     <>
       <ElevationScroll>
@@ -118,78 +217,7 @@ function Header() {
             >
               <img alt="company logo" src={logo} className="logo-size" />
             </Button>
-            {matches ? null : (
-              <>
-                <Tabs
-                  value={value}
-                  onChange={handleTabChange}
-                  textColor="inherit"
-                  //   indicatorColor="secondary"
-                  sx={{ marginLeft: "auto" }}
-                >
-                  {routes.map((route, index) => (
-                    <Tab
-                      key={`${route.name}-${index}`}
-                      label={route.name}
-                      component={Link}
-                      to={route.link}
-                      aria-owns={route.ariaOwns}
-                      aria-haspopup={route.ariaPopup}
-                      onMouseOver={route.mouseOver}
-                      sx={(theme) => ({
-                        ...theme.typography.tab,
-                        minWidth: 10,
-                        marginLeft: "25px",
-                      })}
-                    />
-                  ))}
-                </Tabs>
-                <Button
-                  variant="contained"
-                  color="secondary"
-                  sx={(theme) => ({
-                    ...theme.typography.estimate,
-                    borderRadius: "50px",
-                    marginLeft: "50px",
-                    marginRight: "25px",
-                    height: "45px",
-                  })}
-                >
-                  Free Estimation
-                </Button>
-                <Menu
-                  id="services-menue"
-                  anchorEl={anchorEl}
-                  open={open}
-                  onClose={handleMouseOut}
-                  MenuListProps={{ onMouseLeave: handleMouseOut }}
-                  sx={(theme) => ({
-                    ".MuiMenu-paper": {
-                      ...theme.typography.customClasses.menu,
-                    },
-                  })}
-                  elevation={0}
-                  value={selectedIndex}
-                >
-                  {menuOptions.map((option, idx) => (
-                    <MenuItem
-                      key={`${option.name}-${idx}`}
-                      onClick={(e) =>
-                        handleMenueItemClick(e, option.selectedIndex)
-                      }
-                      selected={option.selectedIndex === selectedIndex}
-                      component={Link}
-                      to={option.link}
-                      sx={(theme) => ({
-                        ...theme.typography.customClasses.menuItem,
-                      })}
-                    >
-                      {option.name}
-                    </MenuItem>
-                  ))}
-                </Menu>
-              </>
-            )}
+            {matches ? drawer : tabs}
           </Toolbar>
         </AppBar>
       </ElevationScroll>
