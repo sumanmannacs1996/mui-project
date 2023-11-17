@@ -11,6 +11,9 @@ import {
   MenuItem,
   SwipeableDrawer,
   IconButton,
+  List,
+  ListItem,
+  ListItemText,
 } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
@@ -191,8 +194,47 @@ function Header() {
         open={openDrawer}
         onClose={() => setOpenDrawer(false)}
         onOpen={() => setOpenDrawer(true)}
+        sx={(theme) => ({
+          ".MuiPaper-root": {
+            ...theme.typography.customClasses.menu,
+          },
+        })}
       >
-        Example Drawer
+        <List disablePadding>
+          {routes.map((route, index) => (
+            <ListItem
+              divider
+              button
+              key={route.name}
+              component={Link}
+              to={route.link}
+              onClick={() => setOpenDrawer(false)}
+            >
+              <ListItemText
+                disableTypography
+                sx={(theme) => ({ ...theme.typography.customClasses.menuItem })}
+              >
+                {route.name}
+              </ListItemText>
+            </ListItem>
+          ))}
+          <ListItem
+            divider
+            button
+            key="Free-Estimation"
+            component={Link}
+            to="/estimation"
+            onClick={() => setOpenDrawer(false)}
+            sx={(theme) => ({ backgroundColor: theme.palette.common.orange })}
+          >
+            <ListItemText
+              disableTypography
+              sx={(theme) => ({ ...theme.typography.customClasses.menuItem })}
+            >
+              Free-Estimation
+            </ListItemText>
+          </ListItem>
+        </List>
       </SwipeableDrawer>
       <IconButton
         onClick={() => setOpenDrawer((prev) => !prev)}
