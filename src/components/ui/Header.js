@@ -208,7 +208,11 @@ function Header() {
               key={route.name}
               component={Link}
               to={route.link}
-              onClick={() => setOpenDrawer(false)}
+              onClick={() => {
+                setOpenDrawer(false);
+                setValue(route.activeIndex);
+              }}
+              selected={value === route.activeIndex}
             >
               <ListItemText
                 disableTypography
@@ -224,7 +228,10 @@ function Header() {
             key="Free-Estimation"
             component={Link}
             to="/estimation"
-            onClick={() => setOpenDrawer(false)}
+            onClick={() => {
+              setOpenDrawer(false);
+              setValue(5);
+            }}
             sx={(theme) => ({ backgroundColor: theme.palette.common.orange })}
           >
             <ListItemText

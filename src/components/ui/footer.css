@@ -1,0 +1,38 @@
+.footer {
+    background-color: #0B72B9;
+    width: 100%;
+}
+
+.footer-adornmrnt {
+    width: 25rem;
+    vertical-align: bottom;
+}
+
+.icon-style {
+    height: 4em;
+    width: 4em;
+}
+
+@media(max-width:900px) {
+    .footer-adornmrnt {
+        width: 18rem;
+        z-index: 100;
+    }
+
+    .icon-style {
+        height: 3em;
+        width: 3em;
+    }
+}
+
+@media(max-width:600px) {
+    .footer-adornmrnt {
+        width: 12rem;
+        z-index: 100;
+    }
+
+    .icon-style {
+        height: 2.5em;
+        width: 2.5em;
+    }
+}
